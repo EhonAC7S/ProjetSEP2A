@@ -1,4 +1,4 @@
-﻿//
+//
 // PivotPage.xaml.cpp
 // Implémentation de la classe PivotPage.
 //
@@ -7,6 +7,8 @@
 #include "PivotPage.xaml.h"
 #include <iostream>
 #include <chrono>
+#include <mutex>
+#include <thread>
 
 using namespace Chrono;
 using namespace Chrono::Common;
@@ -31,15 +33,46 @@ using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Interop;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
+Windows::Foundation::IAsyncOperation<Windows::Devices::Geolocation::Geoposition^>^ m_getOperation;
+
+using namespace std;
+
+//variable
+mutex ChronoMutex;
+double latitude;
+double longitude;
+
+static UINT funct() { 
+	while (1) {
+		lock_guard<mutex> locker(ChronoMutex);
+	}
+	return 0;
+}
 
 
+static UINT geo() {
+	while (1) {
+		Geolocator^ geolocator = ref new Geolocator();
+		m_getOperation = nullptr;
+		m_getOperation = geolocator->GetGeopositionAsync();
+		m_getOperation->Completed = ref new AsyncOperationCompletedHandler<Geoposition^>(
+			[=](IAsyncOperation<Geoposition^>^ asyncOperation, AsyncStatus status) mutable
+		{
+			if (status != AsyncStatus::Error)
+			{
+				Geoposition^ geoposition = asyncOperation->GetResults();
+				latitude = geoposition->Coordinate->Latitude;
+				longitude = geoposition->Coordinate->Longitude;
+			}
+		});
 
-// Pour plus d'informations sur le modèle Application Pivot, consultez la page http://go.microsoft.com/fwlink/?LinkID=391641
+	}
+	return 0;
+}
 
-PivotPage::PivotPage()
-{
+PivotPage::PivotPage(){
+	
 	InitializeComponent();
-
 	NavigationCacheMode = Navigation::NavigationCacheMode::Required;
 
 	_resourceLoader = ResourceLoader::GetForCurrentView(L"Resources");
@@ -50,6 +83,15 @@ PivotPage::PivotPage()
 
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
+	ChronoMutex.lock();
+	thread Threadpatate(funct);
+	Threadpatate.detach();
+
+	thread Threadgeo(geo);
+	Threadgeo.detach();
+
+
+	//dispacherTimer
 }
 
 DependencyProperty^ PivotPage::_navigationHelperProperty = nullptr;
@@ -146,8 +188,24 @@ void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 	}, task_continuation_context::use_current());
 }
 
+
+//texte
 void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	
+
 }
 
+
+//start
+void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	textBlock->Text = "" + latitude;
+	ChronoMutex.unlock();
+}
+
+//stop
+void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	ChronoMutex.lock();
+}
