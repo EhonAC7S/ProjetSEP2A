@@ -6,6 +6,7 @@
 #pragma once
 
 #include "PivotPage.g.h"
+#include <time.h>
 
 namespace Chrono
 {
@@ -68,5 +69,8 @@ namespace Chrono
 		static Windows::UI::Xaml::DependencyProperty^ _defaultViewModelProperty;
 		static Windows::UI::Xaml::DependencyProperty^ _navigationHelperProperty;
 		void textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void button_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e); // Start
+		void button1_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e); // Stop
+		void button2_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e); // Reset
 	};
 }
