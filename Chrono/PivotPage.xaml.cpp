@@ -41,10 +41,29 @@ using namespace std;
 mutex ChronoMutex;
 double latitude;
 double longitude;
+Chronometre^ chronoTime;
 
 static UINT funct() { 
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
+	}
+	return 0;
+}
+
+static UINT timeChrono() {
+	
+	while (1) {
+		// On actualise le text bloc avec le chronotime.
+		// Le string à envoyer à textbloc : ChronoDisplayer::affichageChrono(chronoTime->getTimeElapsed());
+		// Mutex? Wait()? pour éviter les actualisation trop rapide?
+		float elapsedTime = chronoTime->getTimeElapsed();
+
+		int millisec = (int)(elapsedTime - floor(elapsedTime)) * 1000; //On recup les décimales de elapsedTime et on miltiplie par 1000 pour avoir les millisec en int
+		int sec = (int)floor(elapsedTime); // On recupere le reste (total des secondes)
+		int min = sec / 60; //Divions euclidienne -> nb de paquet de 60 sec = nb de min
+		sec = sec % 60; //Reste de la div est le nb de secondes à afficher
+		
+		//textBlock->Text = to_string(min) + string(":") + to_string(sec) + string(":") + to_string(millisec); // On concatene le tout
 	}
 	return 0;
 }
@@ -63,6 +82,7 @@ static UINT geo() {
 				Geoposition^ geoposition = asyncOperation->GetResults();
 				latitude = geoposition->Coordinate->Latitude;
 				longitude = geoposition->Coordinate->Longitude;
+				
 			}
 		});
 
@@ -83,6 +103,10 @@ PivotPage::PivotPage(){
 
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
+
+	// Init Chrono : 
+	chronoTime = ref new Chronometre();
+
 	ChronoMutex.lock();
 	thread Threadpatate(funct);
 	Threadpatate.detach();
@@ -90,7 +114,8 @@ PivotPage::PivotPage(){
 	thread Threadgeo(geo);
 	Threadgeo.detach();
 
-
+	thread ThreadChrono(timeChrono);
+	ThreadChrono.detach;
 	//dispacherTimer
 }
 
@@ -201,6 +226,7 @@ void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Win
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	textBlock->Text = "" + latitude;
+	chronoTime->StartRestartChrono();
 	ChronoMutex.unlock();
 }
 
@@ -208,4 +234,12 @@ void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml
 void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	ChronoMutex.lock();
+	chronoTime->StopChrono();
+}
+
+
+// Reset
+void Chrono::PivotPage::button2_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e)
+{
+	chronoTime->resetChrono();
 }

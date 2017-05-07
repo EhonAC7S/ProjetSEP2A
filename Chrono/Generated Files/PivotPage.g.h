@@ -48,6 +48,7 @@ namespace Chrono
         private: ::Windows::UI::Xaml::Controls::Button^ button;
         private: ::Windows::UI::Xaml::Controls::Button^ button1;
         private: ::Windows::UI::Xaml::Controls::TextBlock^ textBlock;
+        private: ::Windows::UI::Xaml::Controls::Button^ button2;
     };
 }
 

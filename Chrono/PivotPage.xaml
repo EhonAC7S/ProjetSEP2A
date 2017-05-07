@@ -29,9 +29,10 @@
 				d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"
 				CommonNavigationTransitionInfo.IsStaggerElement="True">
                 <Grid HorizontalAlignment="Left" Height="353" VerticalAlignment="Top" Width="367" Margin="0,0,-0.333,0">
-                    <Button x:Name="button" Content="Start" HorizontalAlignment="Left" Margin="43,230,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,230,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="button" Content="Start" HorizontalAlignment="Left" Margin="43,230,0,0" VerticalAlignment="Top" Click="button_Click"/>
+                    <Button x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,230,0,0" VerticalAlignment="Top" Click="button1_Click"/>
                     <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="43,84,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged" Height="85" Width="267"/>
+                    <Button x:Name="button2" Content="Reset" HorizontalAlignment="Left" Height="60" Margin="43,283,0,0" VerticalAlignment="Top" Width="267" Click="button2_Click"/>
                 </Grid>
 
                 <!--Liste double trait avec habillage du texte-->

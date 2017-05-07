@@ -91,6 +91,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ChronoDisplayer.h" />
+    <ClInclude Include="Chronometre.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Common\NavigationHelper.h" />
     <ClInclude Include="Common\RelayCommand.h" />
@@ -132,6 +134,8 @@
     <ClCompile Include="App.xaml.cpp">
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
+    <ClCompile Include="ChronoDisplayer.cpp" />
+    <ClCompile Include="Chronometre.cpp" />
     <ClCompile Include="PivotPage.xaml.cpp">
       <DependentUpon>PivotPage.xaml</DependentUpon>
     </ClCompile>
