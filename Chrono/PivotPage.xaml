@@ -19,19 +19,19 @@
     </Page.Transitions>
 
     <Grid>
-        <Pivot x:Uid="Pivot" Title="MY APPLICATION" x:Name="pivot" CommonNavigationTransitionInfo.IsStaggerElement="True">
+        <Pivot Title="Runtastic Biginner" x:Name="pivot" CommonNavigationTransitionInfo.IsStaggerElement="True">
             <!--Élément un de tableau croisé dynamique-->
             <PivotItem
-				x:Uid="PivotItem1"
 				Margin="10,0,23,19.333"
 				Header="Chrono"
 				DataContext="{Binding FirstGroup}"
 				d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"
 				CommonNavigationTransitionInfo.IsStaggerElement="True">
                 <Grid HorizontalAlignment="Left" Height="353" VerticalAlignment="Top" Width="367" Margin="0,0,-0.333,0">
-                    <Button x:Name="button" Content="Start" HorizontalAlignment="Left" Margin="43,230,0,0" VerticalAlignment="Top" Click="button_Click"/>
-                    <Button x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,230,0,0" VerticalAlignment="Top" Click="button1_Click"/>
-                    <Button x:Name="button2" Content="Capture" HorizontalAlignment="Left" Margin="128,140,0,0" VerticalAlignment="Top" Click="button2_Click"/>
+                    <Button x:Name="button" Content="Start" HorizontalAlignment="Left" Margin="43,319,0,-23" VerticalAlignment="Top" Click="button_Click"/>
+                    <Button x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,319,0,-23" VerticalAlignment="Top" Click="button1_Click"/>
+                    <Button x:Name="button2" Content="Capture" HorizontalAlignment="Left" Margin="43,251,0,0" VerticalAlignment="Top" Click="button2_Click" Width="267"/>
+                    <Button x:Name="button3" Content="Reset" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top" Click="button3_Click" Width="267"/>
                     <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="43,84,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged" Height="85" Width="267"/>
                 </Grid>
 
@@ -40,13 +40,12 @@
 
             <!--Élément deux de tableau croisé dynamique-->
             <PivotItem
-				x:Uid="PivotItem2"
 				Margin="9,0,10,14.333"
 				Header="Carte"
 				DataContext="{Binding SecondGroup}"
 				d:DataContext="{Binding Groups[1], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
                 <!--Liste double trait, aucun habillage du texte-->
-                
+
                 <Maps:MapControl x:Name="myMap" Grid.Row="2" 
                                                   ZoomLevel="{Binding ElementName=zoomSlider,Path=Value, Mode=TwoWay}" 
                                                   Heading="{Binding ElementName=headingSlider,Path=Value, Mode=TwoWay}" 

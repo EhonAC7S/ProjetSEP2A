@@ -15,8 +15,6 @@ using namespace Chrono;
 using namespace Chrono::Common;
 using namespace Chrono::Data;
 
-using namespace std::chrono;
-
 using namespace concurrency;
 using namespace Platform;
 using namespace Platform::Collections;
@@ -46,11 +44,13 @@ mutex ChronoMutex;
 chrono::system_clock::time_point SysTime;
 double latitude;
 double longitude;
-long long millisec;
 long long elapsedTime;
+long long millisec;
+long long sec;
+long long minu;
+long long heure;
 bool reset;
 bool stop;
-
 
 
 // Structure contenant les données liées à la mesure du temps et de la position.
@@ -58,8 +58,11 @@ bool stop;
 static UINT MajChrono() {
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
-		auto elapsed = chrono::system_clock::now() - SysTime;
-		millisec = elapsedTime + chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+		auto elapsed1 = chrono::system_clock::now() - SysTime;
+		millisec = elapsedTime + chrono::duration_cast<std::chrono::microseconds>(elapsed1).count();
+		sec = elapsedTime + chrono::duration_cast<std::chrono::microseconds>(elapsed1/100000000).count();
+		minu = elapsedTime + chrono::duration_cast<std::chrono::microseconds>((elapsed1/(600*10^8))%60).count();
+		heure = elapsedTime + chrono::duration_cast<std::chrono::microseconds>((elapsed1/(3600*10^8))%60).count();
 	}
 	return 0;
 }
@@ -86,17 +89,8 @@ static UINT geo() {
 	return 0;
 }
 
-void convertLongLongToTime(long long milli) {
-	int ECHELLE = 1000;
-	long long millisec = milli % ECHELLE; 
-	long long sec = (milli / ECHELLE) % 60; 
-	long long min = ((milli / ECHELLE) / 60) % 60; 
-	long long hour = ((milli / ECHELLE) / 3600); 
-}
-
-
-PivotPage::PivotPage() {
-
+PivotPage::PivotPage(){
+	
 	InitializeComponent();
 	NavigationCacheMode = Navigation::NavigationCacheMode::Required;
 	_resourceLoader = ResourceLoader::GetForCurrentView(L"Resources");
@@ -105,11 +99,11 @@ PivotPage::PivotPage() {
 	navigationHelper->SaveState += ref new SaveStateEventHandler(this, &PivotPage::NavigationHelper_SaveState);
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
-
+	
 	ChronoMutex.lock();
-	elapsedTime = 0;
 	reset = false;
 	stop = false;
+	elapsedTime = 0;
 	thread ThGPS(geo);
 	ThGPS.detach();
 
@@ -120,10 +114,10 @@ PivotPage::PivotPage() {
 	DispatcherTimer^ timer = ref new DispatcherTimer;
 	timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &Chrono::PivotPage::DispatcherTimer_Tick);
 	TimeSpan t;
-
 	t.Duration = 100000;// 200ms expressed in 100s of nanoseconds;
 	timer->Interval = t;
 	timer->Start();
+	
 }
 
 
@@ -143,7 +137,7 @@ void PivotPage::RegisterDependencyProperties()
 	{
 		_defaultViewModelProperty =
 			DependencyProperty::Register("DefaultViewModel",
-				TypeName(IObservableMap<String^, Object^>::typeid), TypeName(PivotPage::typeid), nullptr);
+			TypeName(IObservableMap<String^, Object^>::typeid), TypeName(PivotPage::typeid), nullptr);
 	}
 }
 
@@ -182,8 +176,8 @@ void PivotPage::OnNavigatedFrom(NavigationEventArgs^ e)
 
 void PivotPage::NavigationHelper_LoadState(Object^ sender, LoadStateEventArgs^ e)
 {
-	(void)sender;	// Paramètre non utilisé
-	(void)e;		// Paramètre non utilisé
+	(void) sender;	// Paramètre non utilisé
+	(void) e;		// Paramètre non utilisé
 
 	SampleDataSource::GetGroup(L"Group-1").then([this](SampleDataGroup^ sampleDataGroup)
 	{
@@ -207,15 +201,13 @@ void PivotPage::NavigationHelper_SaveState(Object^ sender, SaveStateEventArgs^ e
 	// TODO: enregistrer l'état unique de la page ici.
 }
 
-/// <summary>
-/// Charge le contenu pour le second élément Pivot lorsqu'il devient visible.
-/// </summary>
+
 void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 {
-	(void)sender;	// Paramètre non utilisé
-	(void)e;		// Paramètre non utilisé
+	(void) sender;	// Paramètre non utilisé
+	(void) e;		// Paramètre non utilisé
 
-					// TODO: créer un modèle de données approprié pour le domaine posant problème afin de remplacer les exemples de données.
+	// TODO: créer un modèle de données approprié pour le domaine posant problème afin de remplacer les exemples de données.
 	SampleDataSource::GetGroup(L"Group-2").then([this](SampleDataGroup^ sampleDataGroup)
 	{
 		DefaultViewModel->Insert(GetSecondGroupName(), sampleDataGroup);
@@ -223,31 +215,26 @@ void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 }
 
 void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform::Object^ e)
-{
+{	
 	if (stop) {
-		
-			
+
 	}
 	else {
-		textBlock->Text = "" + millisec;
-		
+		textBlock->Text = ""+heure+":"+minu+":"+sec+"."+millisec;
 	}
 }
 
 
 void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	//Just declare the DispatcherTimer, and register one event handler on it
-
+	
 }
 
 
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	textBlock->Text = "" + latitude;
 	if (reset) {
 		SysTime = chrono::system_clock::now();
-		
 	}
 	stop = false;
 	ChronoMutex.unlock();
@@ -256,17 +243,15 @@ void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml
 
 void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	
 	if (!stop) {
 		auto elapsed = chrono::system_clock::now() - SysTime;
 		elapsedTime = elapsedTime + chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 	}
+	
 	stop = true;
 	ChronoMutex.lock();
+
 }
-
-
-
 
 
 void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -279,9 +264,9 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 	myMap->ZoomLevel = 12;
 }
 
+//Reset
 void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	textBlock->Text = "00:00:00.00";
 	reset = true;
-	//elapsedTime = 0;
 }
