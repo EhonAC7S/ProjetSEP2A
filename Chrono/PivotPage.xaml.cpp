@@ -9,6 +9,7 @@
 #include <chrono>
 #include <mutex>
 #include <thread>
+#include <ctime>
 
 using namespace Chrono;
 using namespace Chrono::Common;
@@ -23,7 +24,7 @@ using namespace Windows::Devices::Geolocation;
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Collections;
 using namespace Windows::Graphics::Display;
-
+using namespace Windows::Storage::Streams;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
@@ -35,38 +36,29 @@ using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
 Windows::Foundation::IAsyncOperation<Windows::Devices::Geolocation::Geoposition^>^ m_getOperation;
 
+using namespace std::chrono;
 using namespace std;
 
 //variable
 mutex ChronoMutex;
 double latitude;
 double longitude;
-Chronometre^ chronoTime;
+long deciSec;
+double seconds;
+long min;
+long heure;
+int i = 0;
 
-static UINT funct() { 
+
+// Structure contenant les données liées à la mesure du temps et de la position.
+
+static UINT MajChrono() {
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
-	}
+		}
 	return 0;
 }
 
-static UINT timeChrono() {
-	
-	while (1) {
-		// On actualise le text bloc avec le chronotime.
-		// Le string à envoyer à textbloc : ChronoDisplayer::affichageChrono(chronoTime->getTimeElapsed());
-		// Mutex? Wait()? pour éviter les actualisation trop rapide?
-		float elapsedTime = chronoTime->getTimeElapsed();
-
-		int millisec = (int)(elapsedTime - floor(elapsedTime)) * 1000; //On recup les décimales de elapsedTime et on miltiplie par 1000 pour avoir les millisec en int
-		int sec = (int)floor(elapsedTime); // On recupere le reste (total des secondes)
-		int min = sec / 60; //Divions euclidienne -> nb de paquet de 60 sec = nb de min
-		sec = sec % 60; //Reste de la div est le nb de secondes à afficher
-		
-		//textBlock->Text = to_string(min) + string(":") + to_string(sec) + string(":") + to_string(millisec); // On concatene le tout
-	}
-	return 0;
-}
 
 
 static UINT geo() {
@@ -82,7 +74,6 @@ static UINT geo() {
 				Geoposition^ geoposition = asyncOperation->GetResults();
 				latitude = geoposition->Coordinate->Latitude;
 				longitude = geoposition->Coordinate->Longitude;
-				
 			}
 		});
 
@@ -94,30 +85,31 @@ PivotPage::PivotPage(){
 	
 	InitializeComponent();
 	NavigationCacheMode = Navigation::NavigationCacheMode::Required;
-
 	_resourceLoader = ResourceLoader::GetForCurrentView(L"Resources");
-
 	auto navigationHelper = ref new Common::NavigationHelper(this);
 	navigationHelper->LoadState += ref new LoadStateEventHandler(this, &PivotPage::NavigationHelper_LoadState);
 	navigationHelper->SaveState += ref new SaveStateEventHandler(this, &PivotPage::NavigationHelper_SaveState);
-
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
-
-	// Init Chrono : 
-	chronoTime = ref new Chronometre();
-
+	
 	ChronoMutex.lock();
-	thread Threadpatate(funct);
-	Threadpatate.detach();
 
-	thread Threadgeo(geo);
-	Threadgeo.detach();
+	thread ThGPS(geo);
+	ThGPS.detach();
 
-	thread ThreadChrono(timeChrono);
-	ThreadChrono.detach;
-	//dispacherTimer
+	thread ThChrono(MajChrono);
+	ThChrono.detach();
+
+	DispatcherTimer^ timer = ref new DispatcherTimer;
+	timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &Chrono::PivotPage::DispatcherTimer_Tick);
+	TimeSpan t;
+
+	t.Duration = 100000;// 200ms expressed in 100s of nanoseconds;
+	timer->Interval = t;
+	timer->Start();
 }
+
+
 
 DependencyProperty^ PivotPage::_navigationHelperProperty = nullptr;
 DependencyProperty^ PivotPage::_defaultViewModelProperty = nullptr;
@@ -213,33 +205,46 @@ void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 	}, task_continuation_context::use_current());
 }
 
-
-//texte
-void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform::Object^ e)
 {
-	
-
+	i++;
+	double deciSec = i;
+	double sec = (i/33) % 60;
+	double min = (i / 600) % 60;
+	double heure = (i / 36000) % 60;
+	textBlock->Text = ""+ heure+" : "+min+" : " + sec + " : " + deciSec;
 }
 
 
-//start
+void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	//Just declare the DispatcherTimer, and register one event handler on it
+	
+}
+
+
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	textBlock->Text = "" + latitude;
-	chronoTime->StartRestartChrono();
+	textBlock->Text = ""+latitude;
 	ChronoMutex.unlock();
 }
 
-//stop
+
 void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	ChronoMutex.lock();
-	chronoTime->StopChrono();
 }
 
 
-// Reset
-void Chrono::PivotPage::button2_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e)
+
+
+
+void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	chronoTime->resetChrono();
+	BasicGeoposition geoPoint = BasicGeoposition();
+	geoPoint.Latitude = latitude;
+	geoPoint.Longitude = longitude;
+	Geopoint^ CurrentPoint = ref new Geopoint(geoPoint);
+	myMap->Center = CurrentPoint;
+	myMap->ZoomLevel = 12;
 }

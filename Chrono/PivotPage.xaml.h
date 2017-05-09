@@ -6,7 +6,6 @@
 #pragma once
 
 #include "PivotPage.g.h"
-#include <time.h>
 
 namespace Chrono
 {
@@ -59,18 +58,15 @@ namespace Chrono
 
 	private:
 		Windows::ApplicationModel::Resources::ResourceLoader^ _resourceLoader;
-
+		void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform::Object^ e);
 		void SecondPivot_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void NavigationHelper_LoadState(Platform::Object^ sender, Common::LoadStateEventArgs^ e);
 		void NavigationHelper_SaveState(Platform::Object^ sender, Common::SaveStateEventArgs^ e);
-		void AddAppBarButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-		void ItemView_ItemClick(Platform::Object^ sender, Windows::UI::Xaml::Controls::ItemClickEventArgs^ e);
-
 		static Windows::UI::Xaml::DependencyProperty^ _defaultViewModelProperty;
 		static Windows::UI::Xaml::DependencyProperty^ _navigationHelperProperty;
+		void button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-		void button_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e); // Start
-		void button1_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e); // Stop
-		void button2_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e); // Reset
+		void button2_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 	};
 }
