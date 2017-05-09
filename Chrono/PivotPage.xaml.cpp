@@ -42,6 +42,7 @@ using namespace std;
 
 //variable
 mutex ChronoMutex;
+mutex SynchroMutex;
 chrono::system_clock::time_point SysTime;
 double latitude;
 double longitude;
@@ -53,6 +54,10 @@ long long heure;
 bool reset;
 bool stop;
 bool start;
+Platform::String^ heureStr;
+Platform::String^ minuStr;
+Platform::String^ secStr;
+Platform::String^ millisecstr;
 
 
 // Structure contenant les données liées à la mesure du temps et de la position.
@@ -60,6 +65,7 @@ bool start;
 static UINT MajChrono() {
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
+		lock_guard<mutex> locker1(SynchroMutex);
 		auto elapsed1 = chrono::system_clock::now() - SysTime;
 		elapsed1 = elapsed1 + elapsedTime;
 		millisec = (chrono::duration_cast<std::chrono::milliseconds>(elapsed1).count()/10) % 100;
@@ -72,6 +78,7 @@ static UINT MajChrono() {
 
 static UINT geo() {
 	while (1) {
+		lock_guard<mutex> locker(SynchroMutex);
 		Geolocator^ geolocator = ref new Geolocator();
 		m_getOperation = nullptr;
 		m_getOperation = geolocator->GetGeopositionAsync();
@@ -101,15 +108,17 @@ PivotPage::PivotPage() {
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
 	ChronoMutex.lock();
+	SynchroMutex.lock();
+	SynchroMutex.unlock();
 	reset = false;
 	stop = true;
 	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
 	thread ThGPS(geo);
 	ThGPS.detach();
-
 	thread ThChrono(MajChrono);
 	ThChrono.detach();
 	//initialisation des boutons
+	this->button2->IsEnabled = false;
 	this->button3->IsEnabled = false;
 	this->button1->IsEnabled = false;
 	DispatcherTimer^ timer = ref new DispatcherTimer;
@@ -224,10 +233,10 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 		//On ne fait rien 
 	}
 	else {
-		Platform::String^ heureStr = heure.ToString();
-		Platform::String^ minuStr = minu.ToString();
-		Platform::String^ secStr = sec.ToString();
-		Platform::String^ millisecstr = millisec.ToString();
+		heureStr = heure.ToString();
+		minuStr = minu.ToString();
+		secStr = sec.ToString();
+		millisecstr = millisec.ToString();
 		if (heure < 10) {
 			heureStr = "0" + heureStr;
 		}
@@ -249,6 +258,7 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 //start
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
+	this->button2->IsEnabled = true;
 	if (reset || stop) {
 		this->button->IsEnabled = false;
 		this->button1->IsEnabled = true;
@@ -292,22 +302,29 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 	Geopoint^ CurrentPoint = ref new Geopoint(geoPoint);
 	myMap->Center = CurrentPoint;
 	myMap->ZoomLevel = 12;
+	SynchroMutex.lock();
+	text1->Text = "latitude :"+latitude;
+	text2->Text = "longitude :" + longitude;
+	text3->Text = "" + heureStr + ":" + minuStr + ":" + secStr + "." + millisecstr;
+	SynchroMutex.unlock();
 }
 
 
-void Chrono::PivotPage::textBlock_SelectionChanged3(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+
+
+void Chrono::PivotPage::textBlock3_SelectionChanged3(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 
 }
 
 
-void Chrono::PivotPage::textBlock_SelectionChanged2(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void Chrono::PivotPage::textBlock2_SelectionChanged2(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 
 }
 
 
-void Chrono::PivotPage::textBlock_SelectionChanged1(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void Chrono::PivotPage::textBlock1_SelectionChanged1(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 
 }
