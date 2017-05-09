@@ -34,6 +34,7 @@ using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Interop;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
+
 Windows::Foundation::IAsyncOperation<Windows::Devices::Geolocation::Geoposition^>^ m_getOperation;
 
 using namespace std::chrono;
@@ -44,14 +45,14 @@ mutex ChronoMutex;
 chrono::system_clock::time_point SysTime;
 double latitude;
 double longitude;
-//long long elapsedTime;
-chrono::system_clock::duration elapsedTime; /////////////////////////////////////////
+chrono::system_clock::duration elapsedTime;
 long long millisec;
 long long sec;
 long long minu;
 long long heure;
 bool reset;
 bool stop;
+bool start;
 
 
 // Structure contenant les données liées à la mesure du temps et de la position.
@@ -60,12 +61,14 @@ static UINT MajChrono() {
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
 		auto elapsed1 = chrono::system_clock::now() - SysTime;
-		elapsed1 = elapsed1 + elapsedTime; /////////////////////////////////////////
-		millisec = chrono::duration_cast<std::chrono::microseconds>(elapsed1).count(); /////////////////////////////////////////
-		sec = chrono::duration_cast<std::chrono::microseconds>(elapsed1/100000000).count();
-		minu = chrono::duration_cast<std::chrono::microseconds>((elapsed1/(600*10^8))%60).count();
-		heure = chrono::duration_cast<std::chrono::microseconds>((elapsed1/(3600*10^8))%60).count();
+		elapsed1 = elapsed1 + elapsedTime;
+		millisec =  (chrono::duration_cast<std::chrono::milliseconds>(elapsed1).count())%10;
+		sec = (chrono::duration_cast<std::chrono::seconds>(elapsed1).count())%60;
+		minu = (chrono::duration_cast<std::chrono::minutes>(elapsed1).count())%60;
+		heure = (chrono::duration_cast<std::chrono::hours>(elapsed1%60).count())%60;
+	
 	}
+
 	return 0;
 }
 
@@ -104,12 +107,12 @@ PivotPage::PivotPage(){
 	
 	ChronoMutex.lock();
 	reset = false;
-	stop = true; /////////////////////////////////////////
+	start = false;
+	stop = true;
 	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
 	thread ThGPS(geo);
 	ThGPS.detach();
 
-	SysTime = chrono::system_clock::now();
 	thread ThChrono(MajChrono);
 	ThChrono.detach();
 
@@ -203,6 +206,9 @@ void PivotPage::NavigationHelper_SaveState(Object^ sender, SaveStateEventArgs^ e
 	// TODO: enregistrer l'état unique de la page ici.
 }
 
+void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+}
 
 void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 {
@@ -219,7 +225,7 @@ void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform::Object^ e)
 {	
 	if (stop) {
-
+		//On ne fait rien 
 	}
 	else {
 		textBlock->Text = ""+heure+":"+minu+":"+sec+"."+millisec;
@@ -227,36 +233,28 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 }
 
 
-void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-	
-}
-
-
+//start
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (reset || stop) { /////////////////////////////////////////
-		SysTime = chrono::system_clock::now();
+	if (reset || stop) {
 		stop = false;
+		start = true;
 		ChronoMutex.unlock();
-	}
-	
-	
+	}	
 }
 
-
-void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e) /////////////////////////////////////////
+//stop
+void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (!stop) {
-		
-		elapsedTime = chrono::system_clock::now() - SysTime + elapsedTime;
+	if (start) {
 		stop = true;
+		start = false;
+		elapsedTime = chrono::system_clock::now() - SysTime + elapsedTime;
 		ChronoMutex.lock();
 	}
-
 }
 
-
+//capture
 void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	BasicGeoposition geoPoint = BasicGeoposition();
@@ -270,11 +268,27 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 //Reset
 void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (stop) { /////////////////////////////////////////
+	if (stop) {
 		textBlock->Text = "00:00:00.00";
 		reset = true;
-		elapsedTime = chrono::system_clock::now() - chrono::system_clock::now(); /////////////////////////////////////////
+		elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
 	}
-	
-	
+}
+
+
+void Chrono::PivotPage::textBlock_SelectionChanged3(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+
+}
+
+
+void Chrono::PivotPage::textBlock_SelectionChanged2(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+
+}
+
+
+void Chrono::PivotPage::textBlock_SelectionChanged1(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+
 }

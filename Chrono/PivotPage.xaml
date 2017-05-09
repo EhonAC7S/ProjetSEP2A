@@ -32,7 +32,7 @@
                     <Button x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,319,0,-23" VerticalAlignment="Top" Click="button1_Click"/>
                     <Button x:Name="button2" Content="Capture" HorizontalAlignment="Left" Margin="43,251,0,0" VerticalAlignment="Top" Click="button2_Click" Width="267"/>
                     <Button x:Name="button3" Content="Reset" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top" Click="button3_Click" Width="267"/>
-                    <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="43,84,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged" Height="85" Width="267"/>
+                    <TextBlock x:Name="textBlock" HorizontalAlignment="Center" FontSize="60"  Margin="28,131,25,0" TextWrapping="Wrap" Text="00:00:00.00" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged" Height="85" Width="314"/>
                 </Grid>
 
                 <!--Liste double trait avec habillage du texte-->
@@ -51,6 +51,18 @@
                                                   Heading="{Binding ElementName=headingSlider,Path=Value, Mode=TwoWay}" 
                                                   DesiredPitch="{Binding ElementName=desiredPitchSlider,Path=Value, Mode=TwoWay}"  
                                                   />
+            </PivotItem>
+            <PivotItem
+                
+                Margin="9,0,10,14.333"
+				Header="Points d'intérêts"
+				DataContext="{Binding SecondGroup}"
+				d:DataContext="{Binding Groups[1], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
+                <Grid HorizontalAlignment="Left" Height="504" VerticalAlignment="Top" Width="367" Margin="4,0,0,0">
+                    <TextBlock x:Name="text1" HorizontalAlignment="Left" FontSize="23"  Margin="43,10,0,0" TextWrapping="Wrap" Text="TextBlock1" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged1" Height="85" Width="267"/>
+                    <TextBlock x:Name="text2" HorizontalAlignment="Left" FontSize="23"  Margin="43,139,0,0" TextWrapping="Wrap" Text="TextBlock2" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged2" Height="85" Width="267"/>
+                    <TextBlock x:Name="text3" HorizontalAlignment="Left" FontSize="23"  Margin="43,263,0,0" TextWrapping="Wrap" Text="TextBlock3" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged3" Height="85" Width="267"/>
+                </Grid>
             </PivotItem>
         </Pivot>
     </Grid>
