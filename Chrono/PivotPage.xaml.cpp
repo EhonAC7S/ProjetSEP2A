@@ -62,7 +62,7 @@ static UINT MajChrono() {
 		lock_guard<mutex> locker(ChronoMutex);
 		auto elapsed1 = chrono::system_clock::now() - SysTime;
 		elapsed1 = elapsed1 + elapsedTime;
-		millisec =  (chrono::duration_cast<std::chrono::milliseconds>(elapsed1).count())%10;
+		millisec = ((chrono::duration_cast<std::chrono::milliseconds>(elapsed1).count())/10) % 100;
 		sec = (chrono::duration_cast<std::chrono::seconds>(elapsed1).count())%60;
 		minu = (chrono::duration_cast<std::chrono::minutes>(elapsed1).count())%60;
 		heure = (chrono::duration_cast<std::chrono::hours>(elapsed1%60).count())%60;
@@ -227,7 +227,24 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 		//On ne fait rien 
 	}
 	else {
-		textBlock->Text = ""+heure+":"+minu+":"+sec+"."+millisec;
+		Platform::String^ heureStr = heure.ToString();
+		Platform::String^ minuStr = minu.ToString();
+		Platform::String^ secStr = sec.ToString();
+		Platform::String^ millisecstr = millisec.ToString();
+		if (heure < 10) {
+			heureStr = "0" + heureStr;
+		}
+		if (minu < 10) {
+			minuStr = "0" + minuStr;
+		}
+		if (sec < 10) {
+			secStr = "0" + secStr;
+		}
+		if (millisec < 10) {
+			millisecstr = "0" + millisecstr;
+		}
+
+		textBlock->Text = ""+ heureStr +":"+ minuStr +":"+ secStr +"."+ millisecstr;
 	}
 }
 
@@ -256,8 +273,10 @@ void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml
 		stop = false;
 		start = true;
 		SysTime = chrono::system_clock::now();
-		ChronoMutex.unlock();
 	}	
+	if (start) {
+		ChronoMutex.unlock();
+	}
 }
 
 //stop
