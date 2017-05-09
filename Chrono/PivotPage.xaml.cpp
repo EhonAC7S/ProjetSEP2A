@@ -41,13 +41,12 @@ using namespace std;
 
 //variable
 mutex ChronoMutex;
+chrono::system_clock::time_point SysTime;
 double latitude;
 double longitude;
-long deciSec;
-double seconds;
-long min;
-long heure;
-int i = 0;
+long long millisec;
+bool reset;
+bool stop;
 
 
 // Structure contenant les données liées à la mesure du temps et de la position.
@@ -55,6 +54,8 @@ int i = 0;
 static UINT MajChrono() {
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
+		auto elapsed = chrono::system_clock::now() - SysTime;
+		millisec = chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 		}
 	return 0;
 }
@@ -93,20 +94,22 @@ PivotPage::PivotPage(){
 	SetValue(_navigationHelperProperty, navigationHelper);
 	
 	ChronoMutex.lock();
-
+	reset = false;
+	stop = false;
 	thread ThGPS(geo);
 	ThGPS.detach();
 
+	SysTime = chrono::system_clock::now();
 	thread ThChrono(MajChrono);
 	ThChrono.detach();
 
 	DispatcherTimer^ timer = ref new DispatcherTimer;
 	timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &Chrono::PivotPage::DispatcherTimer_Tick);
 	TimeSpan t;
-
 	t.Duration = 100000;// 200ms expressed in 100s of nanoseconds;
 	timer->Interval = t;
 	timer->Start();
+	
 }
 
 
@@ -190,9 +193,7 @@ void PivotPage::NavigationHelper_SaveState(Object^ sender, SaveStateEventArgs^ e
 	// TODO: enregistrer l'état unique de la page ici.
 }
 
-/// <summary>
-/// Charge le contenu pour le second élément Pivot lorsqu'il devient visible.
-/// </summary>
+
 void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 {
 	(void) sender;	// Paramètre non utilisé
@@ -206,37 +207,37 @@ void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 }
 
 void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform::Object^ e)
-{
-	i++;
-	double deciSec = i;
-	double sec = (i/33) % 60;
-	double min = (i / 600) % 60;
-	double heure = (i / 36000) % 60;
-	textBlock->Text = ""+ heure+" : "+min+" : " + sec + " : " + deciSec;
+{	
+	if (stop) {
+
+	}
+	else {
+		textBlock->Text = "" + millisec;
+	}
 }
 
 
 void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	//Just declare the DispatcherTimer, and register one event handler on it
 	
 }
 
 
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	textBlock->Text = ""+latitude;
+	if (reset) {
+		SysTime = chrono::system_clock::now();
+	}
+	stop = false;
 	ChronoMutex.unlock();
 }
 
 
 void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
+	stop = true;
 	ChronoMutex.lock();
 }
-
-
-
 
 
 void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -247,4 +248,11 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 	Geopoint^ CurrentPoint = ref new Geopoint(geoPoint);
 	myMap->Center = CurrentPoint;
 	myMap->ZoomLevel = 12;
+}
+
+//Reset
+void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	textBlock->Text = "00:00:00.00";
+	reset = true;
 }
