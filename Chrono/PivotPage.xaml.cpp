@@ -104,7 +104,6 @@ PivotPage::PivotPage(){
 	navigationHelper->SaveState += ref new SaveStateEventHandler(this, &PivotPage::NavigationHelper_SaveState);
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
-	
 	ChronoMutex.lock();
 	reset = false;
 	start = false;
@@ -119,7 +118,7 @@ PivotPage::PivotPage(){
 	DispatcherTimer^ timer = ref new DispatcherTimer;
 	timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &Chrono::PivotPage::DispatcherTimer_Tick);
 	TimeSpan t;
-	t.Duration = 100000;// 200ms expressed in 100s of nanoseconds;
+	t.Duration = 10000;// expressed in 100s of nanoseconds;
 	timer->Interval = t;
 	timer->Start();
 	
@@ -233,6 +232,21 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 }
 
 
+//start
+void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	if (start) {
+
+	}
+	else {
+		if (reset) {
+			SysTime = chrono::system_clock::now();
+		}
+		else if (stop) {
+		}
+		else{
+			SysTime = chrono::system_clock::now();
+		}
 //start
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
