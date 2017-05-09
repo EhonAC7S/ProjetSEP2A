@@ -62,17 +62,13 @@ static UINT MajChrono() {
 		lock_guard<mutex> locker(ChronoMutex);
 		auto elapsed1 = chrono::system_clock::now() - SysTime;
 		elapsed1 = elapsed1 + elapsedTime;
-		millisec = ((chrono::duration_cast<std::chrono::milliseconds>(elapsed1).count())/10) % 100;
-		sec = (chrono::duration_cast<std::chrono::seconds>(elapsed1).count())%60;
-		minu = (chrono::duration_cast<std::chrono::minutes>(elapsed1).count())%60;
-		heure = (chrono::duration_cast<std::chrono::hours>(elapsed1%60).count())%60;
-	
+		millisec = (chrono::duration_cast<std::chrono::milliseconds>(elapsed1).count()/10) % 100;
+		sec = (chrono::duration_cast<std::chrono::seconds>(elapsed1).count()) % 60;
+		minu = (chrono::duration_cast<std::chrono::minutes>(elapsed1).count()) % 60;
+		heure = (chrono::duration_cast<std::chrono::hours>(elapsed1 % 60).count()) % 60;
 	}
-
 	return 0;
 }
-
-
 
 static UINT geo() {
 	while (1) {
@@ -94,8 +90,8 @@ static UINT geo() {
 	return 0;
 }
 
-PivotPage::PivotPage(){
-	
+PivotPage::PivotPage() {
+
 	InitializeComponent();
 	NavigationCacheMode = Navigation::NavigationCacheMode::Required;
 	_resourceLoader = ResourceLoader::GetForCurrentView(L"Resources");
@@ -106,7 +102,6 @@ PivotPage::PivotPage(){
 	SetValue(_navigationHelperProperty, navigationHelper);
 	ChronoMutex.lock();
 	reset = false;
-	start = false;
 	stop = true;
 	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
 	thread ThGPS(geo);
@@ -114,14 +109,16 @@ PivotPage::PivotPage(){
 
 	thread ThChrono(MajChrono);
 	ThChrono.detach();
-
+	//initialisation des boutons
+	this->button3->IsEnabled = false;
+	this->button1->IsEnabled = false;
 	DispatcherTimer^ timer = ref new DispatcherTimer;
 	timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &Chrono::PivotPage::DispatcherTimer_Tick);
 	TimeSpan t;
 	t.Duration = 10000;// expressed in 100s of nanoseconds;
 	timer->Interval = t;
 	timer->Start();
-	
+
 }
 
 
@@ -141,7 +138,7 @@ void PivotPage::RegisterDependencyProperties()
 	{
 		_defaultViewModelProperty =
 			DependencyProperty::Register("DefaultViewModel",
-			TypeName(IObservableMap<String^, Object^>::typeid), TypeName(PivotPage::typeid), nullptr);
+				TypeName(IObservableMap<String^, Object^>::typeid), TypeName(PivotPage::typeid), nullptr);
 	}
 }
 
@@ -180,8 +177,8 @@ void PivotPage::OnNavigatedFrom(NavigationEventArgs^ e)
 
 void PivotPage::NavigationHelper_LoadState(Object^ sender, LoadStateEventArgs^ e)
 {
-	(void) sender;	// Paramètre non utilisé
-	(void) e;		// Paramètre non utilisé
+	(void)sender;	// Paramètre non utilisé
+	(void)e;		// Paramètre non utilisé
 
 	SampleDataSource::GetGroup(L"Group-1").then([this](SampleDataGroup^ sampleDataGroup)
 	{
@@ -211,10 +208,10 @@ void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Win
 
 void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 {
-	(void) sender;	// Paramètre non utilisé
-	(void) e;		// Paramètre non utilisé
+	(void)sender;	// Paramètre non utilisé
+	(void)e;		// Paramètre non utilisé
 
-	// TODO: créer un modèle de données approprié pour le domaine posant problème afin de remplacer les exemples de données.
+					// TODO: créer un modèle de données approprié pour le domaine posant problème afin de remplacer les exemples de données.
 	SampleDataSource::GetGroup(L"Group-2").then([this](SampleDataGroup^ sampleDataGroup)
 	{
 		DefaultViewModel->Insert(GetSecondGroupName(), sampleDataGroup);
@@ -222,7 +219,7 @@ void PivotPage::SecondPivot_Loaded(Object^ sender, RoutedEventArgs ^e)
 }
 
 void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform::Object^ e)
-{	
+{
 	if (stop) {
 		//On ne fait rien 
 	}
@@ -250,31 +247,15 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 
 
 //start
-/*void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-	if (start) {
-
-	}
-	else {
-		if (reset) {
-			SysTime = chrono::system_clock::now();
-		}
-		else if (stop) {
-		}
-		else {
-			SysTime = chrono::system_clock::now();
-		}
-	}
-}*/
-//start
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	if (reset || stop) {
+		this->button->IsEnabled = false;
+		this->button1->IsEnabled = true;
+		this->button3->IsEnabled = false;
 		stop = false;
-		start = true;
+		reset = false;
 		SysTime = chrono::system_clock::now();
-	}	
-	if (start) {
 		ChronoMutex.unlock();
 	}
 }
@@ -282,12 +263,24 @@ void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml
 //stop
 void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (start) {
-		stop = true;
-		start = false;
-		elapsedTime = chrono::system_clock::now() - SysTime + elapsedTime;
-		ChronoMutex.lock();
-	}
+	this->button->IsEnabled = true;
+	this->button1->IsEnabled = false;
+	this->button3->IsEnabled = true;
+	stop = true;
+	elapsedTime = chrono::system_clock::now() - SysTime + elapsedTime;
+	ChronoMutex.lock();
+
+}
+
+//Reset
+void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	this->button3->IsEnabled = false;
+	this->button1->IsEnabled = false;
+	textBlock->Text = "00:00:00.00";
+	reset = true;
+	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
+	
 }
 
 //capture
@@ -299,16 +292,6 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 	Geopoint^ CurrentPoint = ref new Geopoint(geoPoint);
 	myMap->Center = CurrentPoint;
 	myMap->ZoomLevel = 12;
-}
-
-//Reset
-void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-	if (stop) {
-		textBlock->Text = "00:00:00.00";
-		reset = true;
-		elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
-	}
 }
 
 
