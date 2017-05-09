@@ -44,7 +44,8 @@ mutex ChronoMutex;
 chrono::system_clock::time_point SysTime;
 double latitude;
 double longitude;
-long long elapsedTime;
+//long long elapsedTime;
+chrono::system_clock::duration elapsedTime; /////////////////////////////////////////
 long long millisec;
 long long sec;
 long long minu;
@@ -59,10 +60,11 @@ static UINT MajChrono() {
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
 		auto elapsed1 = chrono::system_clock::now() - SysTime;
-		millisec = elapsedTime + chrono::duration_cast<std::chrono::microseconds>(elapsed1).count();
-		sec = elapsedTime + chrono::duration_cast<std::chrono::microseconds>(elapsed1/100000000).count();
-		minu = elapsedTime + chrono::duration_cast<std::chrono::microseconds>((elapsed1/(600*10^8))%60).count();
-		heure = elapsedTime + chrono::duration_cast<std::chrono::microseconds>((elapsed1/(3600*10^8))%60).count();
+		elapsed1 = elapsed1 + elapsedTime; /////////////////////////////////////////
+		millisec = chrono::duration_cast<std::chrono::microseconds>(elapsed1).count(); /////////////////////////////////////////
+		sec = chrono::duration_cast<std::chrono::microseconds>(elapsed1/100000000).count();
+		minu = chrono::duration_cast<std::chrono::microseconds>((elapsed1/(600*10^8))%60).count();
+		heure = chrono::duration_cast<std::chrono::microseconds>((elapsed1/(3600*10^8))%60).count();
 	}
 	return 0;
 }
@@ -102,8 +104,8 @@ PivotPage::PivotPage(){
 	
 	ChronoMutex.lock();
 	reset = false;
-	stop = false;
-	elapsedTime = 0;
+	stop = true; /////////////////////////////////////////
+	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
 	thread ThGPS(geo);
 	ThGPS.detach();
 
@@ -233,23 +235,24 @@ void Chrono::PivotPage::textBlock_SelectionChanged(Platform::Object^ sender, Win
 
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (reset) {
+	if (reset || stop) { /////////////////////////////////////////
 		SysTime = chrono::system_clock::now();
+		stop = false;
+		ChronoMutex.unlock();
 	}
-	stop = false;
-	ChronoMutex.unlock();
+	
+	
 }
 
 
-void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e) /////////////////////////////////////////
 {
 	if (!stop) {
-		auto elapsed = chrono::system_clock::now() - SysTime;
-		elapsedTime = elapsedTime + chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+		
+		elapsedTime = chrono::system_clock::now() - SysTime + elapsedTime;
+		stop = true;
+		ChronoMutex.lock();
 	}
-	
-	stop = true;
-	ChronoMutex.lock();
 
 }
 
@@ -267,6 +270,11 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 //Reset
 void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	textBlock->Text = "00:00:00.00";
-	reset = true;
+	if (stop) { /////////////////////////////////////////
+		textBlock->Text = "00:00:00.00";
+		reset = true;
+		elapsedTime = chrono::system_clock::now() - chrono::system_clock::now(); /////////////////////////////////////////
+	}
+	
+	
 }
