@@ -45,7 +45,7 @@ mutex ChronoMutex;
 chrono::system_clock::time_point SysTime;
 double latitude;
 double longitude;
-chrono::system_clock::duration elapsedTime;
+long long elapsedTime;
 long long millisec;
 long long sec;
 long long minu;
@@ -61,7 +61,6 @@ static UINT MajChrono() {
 	while (1) {
 		lock_guard<mutex> locker(ChronoMutex);
 		auto elapsed1 = chrono::system_clock::now() - SysTime;
-		elapsed1 = elapsed1 + elapsedTime;
 		millisec =  (chrono::duration_cast<std::chrono::milliseconds>(elapsed1).count())%10;
 		sec = (chrono::duration_cast<std::chrono::seconds>(elapsed1).count())%60;
 		minu = (chrono::duration_cast<std::chrono::minutes>(elapsed1).count())%60;
@@ -104,12 +103,11 @@ PivotPage::PivotPage(){
 	navigationHelper->SaveState += ref new SaveStateEventHandler(this, &PivotPage::NavigationHelper_SaveState);
 	SetValue(_defaultViewModelProperty, ref new Platform::Collections::Map<String^, Object^>(std::less<String^>()));
 	SetValue(_navigationHelperProperty, navigationHelper);
-	
 	ChronoMutex.lock();
 	reset = false;
+	stop = false;
 	start = false;
-	stop = true;
-	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
+	elapsedTime = 0;
 	thread ThGPS(geo);
 	ThGPS.detach();
 
@@ -119,7 +117,7 @@ PivotPage::PivotPage(){
 	DispatcherTimer^ timer = ref new DispatcherTimer;
 	timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &Chrono::PivotPage::DispatcherTimer_Tick);
 	TimeSpan t;
-	t.Duration = 100000;// 200ms expressed in 100s of nanoseconds;
+	t.Duration = 10000;// expressed in 100s of nanoseconds;
 	timer->Interval = t;
 	timer->Start();
 	
@@ -236,11 +234,22 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 //start
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (reset || stop) {
+	if (start) {
+
+	}
+	else {
+		if (reset) {
+			SysTime = chrono::system_clock::now();
+		}
+		else if (stop) {
+		}
+		else{
+			SysTime = chrono::system_clock::now();
+		}
 		stop = false;
 		start = true;
 		ChronoMutex.unlock();
-	}	
+	}
 }
 
 //stop
@@ -249,7 +258,6 @@ void Chrono::PivotPage::button1_Click(Platform::Object^ sender, Windows::UI::Xam
 	if (start) {
 		stop = true;
 		start = false;
-		elapsedTime = chrono::system_clock::now() - SysTime + elapsedTime;
 		ChronoMutex.lock();
 	}
 }
@@ -268,11 +276,8 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 //Reset
 void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (stop) {
-		textBlock->Text = "00:00:00.00";
-		reset = true;
-		elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
-	}
+	textBlock->Text = "00:00:00.00";
+	reset = true;
 }
 
 
