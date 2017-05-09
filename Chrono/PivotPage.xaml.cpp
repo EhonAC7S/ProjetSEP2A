@@ -233,7 +233,7 @@ void Chrono::PivotPage::DispatcherTimer_Tick(Platform::Object^ sender, Platform:
 
 
 //start
-void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+/*void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	if (start) {
 
@@ -244,15 +244,18 @@ void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml
 		}
 		else if (stop) {
 		}
-		else{
+		else {
 			SysTime = chrono::system_clock::now();
 		}
+	}
+}*/
 //start
 void Chrono::PivotPage::button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	if (reset || stop) {
 		stop = false;
 		start = true;
+		SysTime = chrono::system_clock::now();
 		ChronoMutex.unlock();
 	}	
 }
