@@ -54,6 +54,10 @@ long long heure;
 bool reset;
 bool stop;
 bool start;
+bool hasNoCaptureReg;
+double latitudeReg;
+double longitudeReg;
+long long timeReg;
 Platform::String^ heureStr;
 Platform::String^ minuStr;
 Platform::String^ secStr;
@@ -112,6 +116,7 @@ PivotPage::PivotPage() {
 	SynchroMutex.unlock();
 	reset = false;
 	stop = true;
+	hasNoCaptureReg = true;
 	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
 	thread ThGPS(geo);
 	ThGPS.detach();
@@ -296,35 +301,35 @@ void Chrono::PivotPage::button3_Click(Platform::Object^ sender, Windows::UI::Xam
 //capture
 void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	BasicGeoposition geoPoint = BasicGeoposition();
-	geoPoint.Latitude = latitude;
-	geoPoint.Longitude = longitude;
-	Geopoint^ CurrentPoint = ref new Geopoint(geoPoint);
-	myMap->Center = CurrentPoint;
-	myMap->ZoomLevel = 12;
-	SynchroMutex.lock();
-	text1->Text = "latitude :"+latitude;
-	text2->Text = "longitude :" + longitude;
-	text3->Text = "" + heureStr + ":" + minuStr + ":" + secStr + "." + millisecstr;
-	SynchroMutex.unlock();
+	if (sec>=3 || minu>0 || heure>0) {
+		BasicGeoposition geoPoint = BasicGeoposition();
+		geoPoint.Latitude = latitude;
+		geoPoint.Longitude = longitude;
+		Geopoint^ CurrentPoint = ref new Geopoint(geoPoint);
+		myMap->Center = CurrentPoint;
+		myMap->ZoomLevel = 12;
+		SynchroMutex.lock();
+		if (hasNoCaptureReg) {
+			list->Items->Append("LAT : " + latitude + " LON : " + longitude + " TEMPS : " + heureStr + ":" + minuStr + ":" + secStr + "." + millisecstr);
+		}
+		else {
+			double speed = sqrt(pow((latitude - latitudeReg),2) + pow((longitude - longitudeReg),2)) / ((double) timeReg);
+			list->Items->Append("LAT : " + latitude + " LON : " + longitude + " TEMPS : " + heureStr + ":" + minuStr + ":" + secStr + "." + millisecstr + " SPEED : " + speed +  "m/s");
+
+		}
+		hasNoCaptureReg = false;
+		latitudeReg = latitude;
+		longitudeReg = longitude;
+		timeReg = sec + minu * 60 + heure * 3600; //en seconde.
+		SynchroMutex.unlock();
+	}
+	
 }
 
 
-
-
-void Chrono::PivotPage::textBlock3_SelectionChanged3(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void Chrono::PivotPage::button4_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-
+	list->Items->Clear();
+	hasNoCaptureReg = true;
 }
 
-
-void Chrono::PivotPage::textBlock2_SelectionChanged2(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-
-}
-
-
-void Chrono::PivotPage::textBlock1_SelectionChanged1(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-
-}

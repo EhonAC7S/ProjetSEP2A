@@ -24,12 +24,10 @@ void ::Chrono::PivotPage::InitializeComponent()
 
     // Get the Pivot named 'pivot'
     pivot = safe_cast<::Windows::UI::Xaml::Controls::Pivot^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"pivot"));
-    // Get the TextBlock named 'text1'
-    text1 = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"text1"));
-    // Get the TextBlock named 'text2'
-    text2 = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"text2"));
-    // Get the TextBlock named 'text3'
-    text3 = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"text3"));
+    // Get the ListView named 'list'
+    list = safe_cast<::Windows::UI::Xaml::Controls::ListView^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"list"));
+    // Get the Button named 'resetPoi'
+    resetPoi = safe_cast<::Windows::UI::Xaml::Controls::Button^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"resetPoi"));
     // Get the MapControl named 'myMap'
     myMap = safe_cast<::Windows::UI::Xaml::Controls::Maps::MapControl^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"myMap"));
     // Get the Button named 'button'
@@ -49,34 +47,26 @@ void ::Chrono::PivotPage::Connect(int connectionId, Platform::Object^ target)
     switch (connectionId)
     {
     case 1:
-        (safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(target))->SelectionChanged +=
-            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::textBlock_SelectionChanged1);
+        (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
+            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::button4_Click);
         break;
     case 2:
-        (safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(target))->SelectionChanged +=
-            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::textBlock_SelectionChanged2);
-        break;
-    case 3:
-        (safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(target))->SelectionChanged +=
-            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::textBlock_SelectionChanged3);
-        break;
-    case 4:
         (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
             ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::button_Click);
         break;
-    case 5:
+    case 3:
         (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
             ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::button1_Click);
         break;
-    case 6:
+    case 4:
         (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
             ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::button2_Click);
         break;
-    case 7:
+    case 5:
         (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
             ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::button3_Click);
         break;
-    case 8:
+    case 6:
         (safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(target))->SelectionChanged +=
             ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Chrono::PivotPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&PivotPage::textBlock_SelectionChanged);
         break;

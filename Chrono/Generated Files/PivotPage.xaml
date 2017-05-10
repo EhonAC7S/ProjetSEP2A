@@ -28,11 +28,11 @@
 				d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"
 				CommonNavigationTransitionInfo.IsStaggerElement="True">
                 <Grid HorizontalAlignment="Left" Height="353" VerticalAlignment="Top" Width="367" Margin="0,0,-0.333,0">
-                    <Button x:ConnectionId='4' x:Name="button" Content="Start" HorizontalAlignment="Left" Margin="43,319,0,-23" VerticalAlignment="Top"                     />
-                    <Button x:ConnectionId='5' x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,319,0,-23" VerticalAlignment="Top"                      />
-                    <Button x:ConnectionId='6' x:Name="button2" Content="Capture" HorizontalAlignment="Left" Margin="43,251,0,0" VerticalAlignment="Top"                       Width="267"/>
-                    <Button x:ConnectionId='7' x:Name="button3" Content="Reset" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top"                       Width="267"/>
-                    <TextBlock x:ConnectionId='8' x:Name="textBlock" HorizontalAlignment="Center" FontSize="60"  Margin="28,131,25,0" TextWrapping="Wrap" Text="00:00:00.00" VerticalAlignment="Top"                                               Height="85" Width="314"/>
+                    <Button x:ConnectionId='2' x:Name="button" Content="Start" HorizontalAlignment="Left" Margin="43,319,0,-23" VerticalAlignment="Top"                     />
+                    <Button x:ConnectionId='3' x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,319,0,-23" VerticalAlignment="Top"                      />
+                    <Button x:ConnectionId='4' x:Name="button2" Content="Capture" HorizontalAlignment="Left" Margin="43,251,0,0" VerticalAlignment="Top"                       Width="267"/>
+                    <Button x:ConnectionId='5' x:Name="button3" Content="Reset" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top"                       Width="267"/>
+                    <TextBlock x:ConnectionId='6' x:Name="textBlock" HorizontalAlignment="Center" FontSize="60"  Margin="28,131,25,0" TextWrapping="Wrap" Text="00:00:00.00" VerticalAlignment="Top"                                               Height="85" Width="314"/>
                 </Grid>
 
                 <!--Liste double trait avec habillage du texte-->
@@ -59,9 +59,8 @@
 				DataContext="{Binding SecondGroup}"
 				d:DataContext="{Binding Groups[1], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
                 <Grid HorizontalAlignment="Left" Height="504" VerticalAlignment="Top" Width="367" Margin="4,0,0,0">
-                    <TextBlock x:ConnectionId='1' x:Name="text1" HorizontalAlignment="Left" FontSize="23"  Margin="43,10,0,0" TextWrapping="Wrap" Text="TextBlock1" VerticalAlignment="Top"                                                Height="85" Width="267"/>
-                    <TextBlock x:ConnectionId='2' x:Name="text2" HorizontalAlignment="Left" FontSize="23"  Margin="43,139,0,0" TextWrapping="Wrap" Text="TextBlock2" VerticalAlignment="Top"                                                Height="85" Width="267"/>
-                    <TextBlock x:ConnectionId='3' x:Name="text3" HorizontalAlignment="Left" FontSize="23"  Margin="43,263,0,0" TextWrapping="Wrap" Text="TextBlock3" VerticalAlignment="Top"                                                Height="85" Width="267"/>
+                    <ListView x:Name="list" Margin="5,5,5,120"/>
+                    <Button x:ConnectionId='1' x:Name="resetPoi" Content="Clear" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top"                       Width="267"/>
                 </Grid>
             </PivotItem>
         </Pivot>

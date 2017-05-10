@@ -13,8 +13,9 @@ namespace Windows {
         namespace Xaml {
             namespace Controls {
                 ref class Pivot;
-                ref class TextBlock;
+                ref class ListView;
                 ref class Button;
+                ref class TextBlock;
             }
         }
     }
@@ -44,9 +45,8 @@ namespace Chrono
         bool _contentLoaded;
     
         private: ::Windows::UI::Xaml::Controls::Pivot^ pivot;
-        private: ::Windows::UI::Xaml::Controls::TextBlock^ text1;
-        private: ::Windows::UI::Xaml::Controls::TextBlock^ text2;
-        private: ::Windows::UI::Xaml::Controls::TextBlock^ text3;
+        private: ::Windows::UI::Xaml::Controls::ListView^ list;
+        private: ::Windows::UI::Xaml::Controls::Button^ resetPoi;
         private: ::Windows::UI::Xaml::Controls::Maps::MapControl^ myMap;
         private: ::Windows::UI::Xaml::Controls::Button^ button;
         private: ::Windows::UI::Xaml::Controls::Button^ button1;

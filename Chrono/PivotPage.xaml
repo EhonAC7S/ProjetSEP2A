@@ -59,9 +59,8 @@
 				DataContext="{Binding SecondGroup}"
 				d:DataContext="{Binding Groups[1], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
                 <Grid HorizontalAlignment="Left" Height="504" VerticalAlignment="Top" Width="367" Margin="4,0,0,0">
-                    <TextBlock x:Name="text1" HorizontalAlignment="Left" FontSize="23"  Margin="43,10,0,0" TextWrapping="Wrap" Text="TextBlock1" VerticalAlignment="Top" SelectionChanged="textBlock1_SelectionChanged1" Height="85" Width="267"/>
-                    <TextBlock x:Name="text2" HorizontalAlignment="Left" FontSize="23"  Margin="43,139,0,0" TextWrapping="Wrap" Text="TextBlock2" VerticalAlignment="Top" SelectionChanged="textBlock2_SelectionChanged2" Height="85" Width="267"/>
-                    <TextBlock x:Name="text3" HorizontalAlignment="Left" FontSize="23"  Margin="43,263,0,0" TextWrapping="Wrap" Text="TextBlock3" VerticalAlignment="Top" SelectionChanged="textBlock3_SelectionChanged3" Height="85" Width="267"/>
+                    <ListView x:Name="list" Margin="5,5,5,120"/>
+                    <Button x:Name="resetPoi" Content="Clear" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top" Click="button4_Click" Width="267"/>
                 </Grid>
             </PivotItem>
         </Pivot>

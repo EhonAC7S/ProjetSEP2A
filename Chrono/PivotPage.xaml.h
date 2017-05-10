@@ -69,6 +69,7 @@ namespace Chrono
 		void textBlock_SelectionChanged(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void button2_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void button3_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void button4_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e);
 		void textBlock3_SelectionChanged3(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void textBlock2_SelectionChanged2(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void textBlock1_SelectionChanged1(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
