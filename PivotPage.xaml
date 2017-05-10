@@ -1,0 +1,63 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Chrono"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Chrono.Data"
+    xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    x:Class="Chrono.PivotPage"
+    mc:Ignorable="d"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Mode=Self}}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <CommonNavigationTransitionInfo IsStaggeringEnabled="True"/>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+    <Grid>
+        <Pivot Title="Runtastic Beginner" x:Name="pivot" CommonNavigationTransitionInfo.IsStaggerElement="True">
+            <!--Élément un de tableau croisé dynamique-->
+            <PivotItem
+				Margin="10,0,23,19.333"
+				Header="Chrono"
+				DataContext="{Binding FirstGroup}"
+				d:DataContext="{Binding Groups[0], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}"
+				CommonNavigationTransitionInfo.IsStaggerElement="True">
+                <Grid HorizontalAlignment="Left" Height="353" VerticalAlignment="Top" Width="367" Margin="0,0,-0.333,0">
+                    <Button x:Name="button" Content="Start" HorizontalAlignment="Left" Margin="43,319,0,-23" VerticalAlignment="Top" Click="button_Click"/>
+                    <Button x:Name="button1" Content="Stop" HorizontalAlignment="Left" Margin="201,319,0,-23" VerticalAlignment="Top" Click="button1_Click"/>
+                    <Button x:Name="button2" Content="Capture" HorizontalAlignment="Left" Margin="43,251,0,0" VerticalAlignment="Top" Click="button2_Click" Width="267"/>
+                    <Button x:Name="button3" Content="Reset" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top" Click="button3_Click" Width="267"/>
+                    <TextBlock x:Name="textBlock" HorizontalAlignment="Center" FontSize="60"  Margin="28,131,25,0" TextWrapping="Wrap" Text="00:00:00.00" VerticalAlignment="Top" SelectionChanged="textBlock_SelectionChanged" Height="85" Width="314"/>
+                </Grid>
+
+                <!--Liste double trait avec habillage du texte-->
+            </PivotItem>
+
+            <!--Élément deux de tableau croisé dynamique-->
+            <PivotItem
+				Margin="9,0,10,14.333"
+				Header="Carte"
+				DataContext="{Binding SecondGroup}"
+				d:DataContext="{Binding Groups[1], Source={d:DesignData Source=/DataModel/SampleData.json, Type=data:SampleDataSource}}">
+                <!--Liste double trait, aucun habillage du texte-->
+
+                <Maps:MapControl x:Name="myMap" Grid.Row="2" 
+                                                  ZoomLevel="{Binding ElementName=zoomSlider,Path=Value, Mode=TwoWay}" 
+                                                  Heading="{Binding ElementName=headingSlider,Path=Value, Mode=TwoWay}" 
+                                                  DesiredPitch="{Binding ElementName=desiredPitchSlider,Path=Value, Mode=TwoWay}" Margin="0,0,-0.167,-75.833"  
+                                                  />
+            </PivotItem>
+            <PivotItem Header="Points d'intérêts">
+                <Grid Margin="0,0,0,10.333">
+                    <ListView x:Name="list" Margin="5,5,5,120"/>
+                    <Button x:Name="resetPoi" Content="Clear" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top" Click="button4_Click" Width="267"/>
+                </Grid>
+            </PivotItem>
+        </Pivot>
+    </Grid>
+</Page>
