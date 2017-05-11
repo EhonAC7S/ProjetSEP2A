@@ -61,7 +61,7 @@
                 <Grid HorizontalAlignment="Left" Height="504" VerticalAlignment="Top" Width="367" Margin="4,0,0,0">
                     <ListView x:Name="list" FontSize="15" Margin="5,5,5,120"/>
                     <Button x:ConnectionId='1' x:Name="resetPoi" Content="Clear" HorizontalAlignment="Left" Margin="43,394,0,-98" VerticalAlignment="Top"                       Width="267"/>
-                    <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" FontSize="20" Margin="43,442,0,0" TextWrapping="Wrap" Text="Moyenne : " VerticalAlignment="Top" Height="52" Width="267"/>
+                    <TextBlock x:Name="textBlock1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Margin="43,442,0,0" TextWrapping="Wrap" Text="Moyenne : " Height="52" Width="267"/>
                 </Grid>
             </PivotItem>
         </Pivot>
