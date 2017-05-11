@@ -40,6 +40,10 @@ Windows::Foundation::IAsyncOperation<Windows::Devices::Geolocation::Geoposition^
 using namespace std::chrono;
 using namespace std;
 
+
+// CONSTANTE : 
+const double DISTANCE_UNITE_LATITUDE_LONGITUDE = 79000; // On a au niveau de Bordeau, environs 1 latitude = 79 km
+
 //variable
 mutex ChronoMutex;
 mutex SynchroMutex;
@@ -58,6 +62,8 @@ bool hasNoCaptureReg;
 double latitudeReg;
 double longitudeReg;
 long long timeReg;
+int nbOfSpeedCapture;
+double meanOfSpeed;
 Platform::String^ heureStr;
 Platform::String^ minuStr;
 Platform::String^ secStr;
@@ -117,6 +123,8 @@ PivotPage::PivotPage() {
 	reset = false;
 	stop = true;
 	hasNoCaptureReg = true;
+	nbOfSpeedCapture = 0;
+	meanOfSpeed = 0;
 	elapsedTime = chrono::system_clock::now() - chrono::system_clock::now();
 	thread ThGPS(geo);
 	ThGPS.detach();
@@ -313,9 +321,11 @@ void Chrono::PivotPage::button2_Click(Platform::Object^ sender, Windows::UI::Xam
 			list->Items->Append("LAT : " + latitude + " LON : " + longitude + " TEMPS : " + heureStr + ":" + minuStr + ":" + secStr + "." + millisecstr);
 		}
 		else {
-			double speed = sqrt(pow((latitude - latitudeReg),2) + pow((longitude - longitudeReg),2)) / ((double) timeReg);
+			double speed = sqrt(pow((latitude - latitudeReg),2) + pow((longitude - longitudeReg),2)) * DISTANCE_UNITE_LATITUDE_LONGITUDE / ((double) timeReg);
 			list->Items->Append("LAT : " + latitude + " LON : " + longitude + " TEMPS : " + heureStr + ":" + minuStr + ":" + secStr + "." + millisecstr + " SPEED : " + speed +  "m/s");
-
+			meanOfSpeed = (meanOfSpeed * nbOfSpeedCapture + speed) / (nbOfSpeedCapture + 1);
+			nbOfSpeedCapture = nbOfSpeedCapture + 1;
+			textBlock1->Text = "Moyenne : " + meanOfSpeed + "m/s";
 		}
 		hasNoCaptureReg = false;
 		latitudeReg = latitude;
@@ -331,5 +341,8 @@ void Chrono::PivotPage::button4_Click(Platform::Object^ sender, Windows::UI::Xam
 {
 	list->Items->Clear();
 	hasNoCaptureReg = true;
+	textBlock1->Text = "Moyenne : ";
+	nbOfSpeedCapture = 0;
+	meanOfSpeed = 0;
 }
 

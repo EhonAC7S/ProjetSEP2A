@@ -28,6 +28,8 @@ void ::Chrono::PivotPage::InitializeComponent()
     list = safe_cast<::Windows::UI::Xaml::Controls::ListView^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"list"));
     // Get the Button named 'resetPoi'
     resetPoi = safe_cast<::Windows::UI::Xaml::Controls::Button^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"resetPoi"));
+    // Get the TextBlock named 'textBlock1'
+    textBlock1 = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"textBlock1"));
     // Get the MapControl named 'myMap'
     myMap = safe_cast<::Windows::UI::Xaml::Controls::Maps::MapControl^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"myMap"));
     // Get the Button named 'button'

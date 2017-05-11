@@ -47,6 +47,7 @@ namespace Chrono
         private: ::Windows::UI::Xaml::Controls::Pivot^ pivot;
         private: ::Windows::UI::Xaml::Controls::ListView^ list;
         private: ::Windows::UI::Xaml::Controls::Button^ resetPoi;
+        private: ::Windows::UI::Xaml::Controls::TextBlock^ textBlock1;
         private: ::Windows::UI::Xaml::Controls::Maps::MapControl^ myMap;
         private: ::Windows::UI::Xaml::Controls::Button^ button;
         private: ::Windows::UI::Xaml::Controls::Button^ button1;
